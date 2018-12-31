@@ -211,7 +211,9 @@ var UIController = (function()
                     }
                 new_html=html.replace('%id%',obj.id);
                 new_html=new_html.replace('%description%',obj.desc);
-                new_html=new_html.replace('%value%',obj.value);
+                var new_number;
+                new_number=UIController.number_formater(obj.value,type);
+                new_html=new_html.replace('%value%',new_number);
                 if(type==='exp'){
                 budgetController.percentage_individual(obj);
                 new_html=new_html.replace('%per%',Math.ceil(obj.percent_expense));
@@ -252,21 +254,69 @@ var UIController = (function()
         budget_percent_calculator : function ()
             {
                         budget_data=budgetController.calculateTotalBudget();
-                
-                        document.querySelector(dom.budget_value).textContent=budget_data[0]; // display total budget remaining inc - exp
+                var new_number;
+                        new_number=UIController.number_formater(budget_data[0]);
+                        document.querySelector(dom.budget_value).textContent=new_number; // display total budget remaining inc - exp
                         if(Number.isNaN(budget_data[1]) || budget_data[1]===0 || budget_data[2]==0){
                             document.querySelector(dom.budget_percent).textContent='...'
                         }
                 else {
                 
                         document.querySelector(dom.budget_percent).textContent=Math.ceil(budget_data[1])+'%';}
-                        
-                        document.querySelector(dom.budget_incom_value).textContent=budget_data[2];
-                
-                        document.querySelector(dom.budget_expense_value).textContent=budget_data[3];
+                        new_number=UIController.number_formater(budget_data[2],'inc');
+                        document.querySelector(dom.budget_incom_value).textContent=new_number;
+                new_number=UIController.number_formater(budget_data[3],'exp');
+                        document.querySelector(dom.budget_expense_value).textContent=new_number;
                 
                         // return [total_b,percnt_total,incom,expense];
                 
+            },
+        number_formater : function (number,type) 
+            {
+            var string_number,int_number,deci_number,splitnum,final_number='';
+            var num_arr = [];
+            var final_arr = [];
+                string_number= number.toFixed(2);
+                splitnum=string_number.split('.');
+                int_number=splitnum[0];
+                deci_number=splitnum[1];
+                for (i=0;i<int_number.length;i++)
+                    {
+                        num_arr.push(int_number[i]);
+                        
+                    }
+                for (i=2;i<(num_arr.length-1);i=i+2)
+                    {
+                        if(i===2)
+                            {
+                                
+                                num_arr.splice(-3,0,',');
+                                i=3;
+                            }
+                        else{
+                            
+                        
+                        
+                        num_arr.splice(-(i+1),0,',');
+                        i++;}
+                    }
+                
+                
+                
+                for(i=0;i<num_arr.length;i++)
+                    {
+                        final_number+=num_arr[i];
+                    }
+                final_number=final_number+'.'+deci_number;
+                if(type==='inc')
+                    {
+                        final_number='+'+final_number;
+                    }
+                else if(type==='exp')
+                    {
+                        final_number='-'+final_number;
+                    }
+                return final_number;
             },
         incom_exp_ader : function (data,type)
             {
