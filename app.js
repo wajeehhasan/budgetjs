@@ -100,6 +100,7 @@ return {
         Data.totalItems.exp.forEach(function(curr){
             percent=(curr.value/total_inc)*100;
             curr.percent_expense=percent;
+            
         })
     },
     percentage_individual : function (item)
@@ -182,6 +183,27 @@ var UIController = (function()
                 document.querySelector(dom.month_year).textContent=m_y;
                     
             },
+        
+        
+        change_clr : function () 
+            
+            {
+            var fields;
+            fields=document.querySelectorAll(dom.add_type+','+dom.add_desc+','+dom.add_btn+','+dom.add_value);
+            var forEachNode = function (list,callback)
+                {
+                for(i=0; i<list.length; i++)
+                    {
+                        callback(list[i]);
+                    }
+                };
+            forEachNode(fields, function (cur) {
+                cur.classList.toggle('red-focus');    
+            })
+                document.querySelector(dom.add_btn).classList.toggle('red');
+            },
+        // add__type // add__description // add__value // add__btn
+        
         getInput : function () 
                 {
                     return {
@@ -196,6 +218,9 @@ var UIController = (function()
             {
                 return dom;
             },
+        
+        
+        
         addUIItem : function (obj,type)
             {
                 if(type==='inc')
@@ -207,7 +232,7 @@ var UIController = (function()
                 else if(type==='exp')
                     {
                     element_incORexp='.expenses__title';
-                    html='<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">%per%%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                    html='<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">%per%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
                     }
                 new_html=html.replace('%id%',obj.id);
                 new_html=new_html.replace('%description%',obj.desc);
@@ -216,7 +241,14 @@ var UIController = (function()
                 new_html=new_html.replace('%value%',new_number);
                 if(type==='exp'){
                 budgetController.percentage_individual(obj);
-                new_html=new_html.replace('%per%',Math.ceil(obj.percent_expense));
+   
+                        
+                    if(obj.percent_expense == Number.POSITIVE_INFINITY || obj.percent_expense == Number.NEGATIVE_INFINITY)
+                        {
+                            new_html=new_html.replace('%per%','__');
+                        }
+                    else {
+                new_html=new_html.replace('%per%',Math.ceil(obj.percent_expense)+'%'); }
                 }
                 document.querySelector(element_incORexp).insertAdjacentHTML('beforeend',new_html);
                 
@@ -248,7 +280,12 @@ var UIController = (function()
                             }
                     }
                 nodeUpdate(fields, function (curr,ind) {
-                    curr.textContent = Math.round(per_list[ind])+'%';
+                    if(per_list[ind] == Number.POSITIVE_INFINITY || per_list[ind] == Number.NEGATIVE_INFINITY){
+                    curr.textContent ='__';    
+                    }
+                    else {
+                    curr.textContent = Math.round(per_list[ind])+'%';} 
+                    
                 }) 
             },
         budget_percent_calculator : function ()
@@ -406,6 +443,7 @@ var controller = (function(budgetCtrl,UICntrl)
                                 }
                             })
                             document.querySelector(dom.container).addEventListener('click',cntrlDeleteItem);
+                            document.querySelector(dom.add_type).addEventListener('change',UICntrl.change_clr);
                         }
 
         };
