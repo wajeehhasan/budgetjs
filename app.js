@@ -292,8 +292,24 @@ var UIController = (function()
             {
                         budget_data=budgetController.calculateTotalBudget();
                 var new_number;
-                        new_number=UIController.number_formater(budget_data[0]);
-                        document.querySelector(dom.budget_value).textContent=new_number; // display total budget remaining inc - exp
+                // display total budget remaining inc - exp
+                        if(budget_data[0]>0)
+                            {
+                                new_number=UIController.number_formater(Math.abs(budget_data[0]),'bug');
+                                document.querySelector(dom.budget_value).textContent='+'+new_number;
+                            }
+                        else if (budget_data[0]<0)
+                            {
+                                new_number=UIController.number_formater(Math.abs(budget_data[0]),'bug');
+                                document.querySelector(dom.budget_value).textContent='-'+new_number;
+
+                            }
+                else if (budget_data[0]===0)
+                    {
+                        new_number=UIController.number_formater(Math.abs(budget_data[0]),'bug');
+                        document.querySelector(dom.budget_value).textContent=new_number;
+
+                    }
                         if(Number.isNaN(budget_data[1]) || budget_data[1]===0 || budget_data[2]==0){
                             document.querySelector(dom.budget_percent).textContent='...'
                         }
@@ -310,6 +326,9 @@ var UIController = (function()
             },
         number_formater : function (number,type) 
             {
+            var string_number,int_number,deci_number,splitnum,final_number='';
+            var num_arr = [];
+            var final_arr = [];
             var string_number,int_number,deci_number,splitnum,final_number='';
             var num_arr = [];
             var final_arr = [];
@@ -353,6 +372,7 @@ var UIController = (function()
                     {
                         final_number='-'+final_number;
                     }
+    
                 return final_number;
             },
         incom_exp_ader : function (data,type)
